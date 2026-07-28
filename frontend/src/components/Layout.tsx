@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Footer from "./Footer";
@@ -30,6 +31,19 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
   function handleLogout() {
     logout();
     navigate("/login", { replace: true });
@@ -56,30 +70,41 @@ export default function Layout() {
             {item.label}
           </NavLink>
         ))}
-
-        <div className="sidebar-footer">
-          <div className="user-chip">
-            <div className="user-avatar">{user ? initials(user.name) : "?"}</div>
-            <div>
-              <div className="user-name">{user?.name}</div>
-              <div className="user-role">{user?.role}</div>
-            </div>
-          </div>
-          <button
-            className="btn btn-ghost btn-sm"
-            style={{ width: "100%", marginTop: 8, justifyContent: "flex-start" }}
-            onClick={handleLogout}
-          >
-            ← Log out
-          </button>
-        </div>
       </aside>
 
       <div className="main-col">
         <header className="topbar">
-          <h1>Operations Portal</h1>
-          <div className="badge badge-info" style={{ textTransform: "capitalize" }}>
-            {user?.role} access
+          <div>
+            <h1>Operations Portal</h1>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div className="badge badge-info" style={{ textTransform: "capitalize" }}>
+              {user?.role} access
+            </div>
+
+            <div className="user-menu" ref={menuRef}>
+              <button className="user-menu-trigger" onClick={() => setMenuOpen((o) => !o)}>
+                <div className="user-avatar">{user ? initials(user.name) : "?"}</div>
+                <span className="user-menu-chevron" data-open={menuOpen}>▾</span>
+              </button>
+
+              {menuOpen && (
+                <div className="user-menu-dropdown">
+                  <div className="user-menu-header">
+                    <div className="user-avatar">{user ? initials(user.name) : "?"}</div>
+                    <div>
+                      <div className="user-name">{user?.name}</div>
+                      <div className="user-role">{user?.role}</div>
+                    </div>
+                  </div>
+                  <div className="user-menu-divider" />
+                  <button className="user-menu-item" onClick={handleLogout}>
+                    <span>←</span> Log out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

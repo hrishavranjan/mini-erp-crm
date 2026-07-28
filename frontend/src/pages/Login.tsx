@@ -1,8 +1,19 @@
-import { useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Footer from "../components/Footer";
 import "../styles/login.css";
+
+const DEMO_EMAILS = [
+  "admin@erp.com",
+  "sales@erp.com",
+  "warehouse@erp.com",
+  "accounts@erp.com",
+];
+const DEMO_PASSWORD = "Password@123";
+
+const STORAGE_EMAIL_KEY = "demo_login_email";
+const STORAGE_PASSWORD_KEY = "demo_login_password";
 
 export default function Login() {
   const { login } = useAuth();
@@ -14,6 +25,30 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Restore last-used (or default) demo credentials on every mount —
+  // i.e. on refresh, and whenever the user lands back here after logout.
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(STORAGE_EMAIL_KEY);
+    const savedPassword = localStorage.getItem(STORAGE_PASSWORD_KEY);
+    setEmail(savedEmail || DEMO_EMAILS[0]);
+    setPassword(savedPassword || DEMO_PASSWORD);
+  }, []);
+
+  function handleEmailChange(value: string) {
+    setEmail(value);
+    localStorage.setItem(STORAGE_EMAIL_KEY, value);
+  }
+
+  function handlePasswordChange(value: string) {
+    setPassword(value);
+    localStorage.setItem(STORAGE_PASSWORD_KEY, value);
+  }
+
+  function fillDemo(demoEmail: string) {
+    handleEmailChange(demoEmail);
+    handlePasswordChange(DEMO_PASSWORD);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -80,12 +115,18 @@ export default function Login() {
                 id="email"
                 className="input"
                 type="email"
+                list="demo-emails"
                 placeholder="you@company.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => handleEmailChange(e.target.value)}
                 required
                 autoFocus
               />
+              <datalist id="demo-emails">
+                {DEMO_EMAILS.map((demoEmail) => (
+                  <option key={demoEmail} value={demoEmail} />
+                ))}
+              </datalist>
             </div>
 
             <div className="field">
@@ -99,7 +140,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                   required
                   style={{ paddingRight: 56 }}
                 />
@@ -123,9 +164,27 @@ export default function Login() {
           </form>
 
           <div className="login-role-hint">
-            <strong>Demo access:</strong> Log in with any seeded role — Admin, Sales,
-            Warehouse, or Accounts — using the credentials provided in the README /
-            submission notes.
+            <strong>Demo access:</strong> Pick a role below (or type any of the emails
+            into the field above — it's an editable dropdown) — password is the same
+            for every role, and editable too.
+            <div className="demo-cred-list">
+              {DEMO_EMAILS.map((demoEmail) => (
+                <button
+                  type="button"
+                  key={demoEmail}
+                  className="demo-cred-row"
+                  onClick={() => fillDemo(demoEmail)}
+                >
+                  <span className="demo-cred-email">{demoEmail}</span>
+                  <span className="demo-cred-role">
+                    {demoEmail.split("@")[0]}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="demo-cred-password">
+              Password for all roles: <code>{DEMO_PASSWORD}</code>
+            </div>
           </div>
         </div>
 

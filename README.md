@@ -18,8 +18,10 @@
 
 | | |
 |---|---|
-| 🖥️ **Frontend** | [_add your deployed Vercel/Netlify URL here_](#) |
-| ⚙️ **Backend API** | [_add your deployed Render URL here_](#) |
+| 🖥️ **Frontend** | [mini-erp-crm-three-blue.vercel.app](https://mini-erp-crm-three-blue.vercel.app/) |
+| ⚙️ **Backend API** | [mini-erp-crm-backend-gc3q.onrender.com](https://mini-erp-crm-backend-gc3q.onrender.com/) |
+
+> ⏳ Backend is on Render's free tier — it may take 30–60s to spin up on the first request after inactivity.
 
 [Overview](#-overview) • [Features](#-features) • [Architecture](#-architecture) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [API Reference](#-api-reference) • [Roles](#-role-based-access-control) • [Postman](#-postman-collection)
 
@@ -106,7 +108,8 @@ stateDiagram-v2
     Confirmed --> [*]
     Cancelled --> [*]
 
-    classDef default fill:#121629,stroke:#4fd1ff,stroke-width:1.5px,color:#f3f5fb;
+    classDef accent fill:#121629,stroke:#4fd1ff,stroke-width:1.5px,color:#f3f5fb
+    class Draft,Confirmed,Cancelled accent
 ```
 
 ---
@@ -285,7 +288,7 @@ A ready-to-import collection is included at [`/postman/Mini_ERP_CRM.postman_coll
 1. Open Postman → **Import** → select the collection file above.
 2. Create (or edit) an environment with a `baseUrl` variable set to:
    - `http://localhost:5000/api` for local development, or
-   - your deployed Render API URL (e.g. `https://your-backend.onrender.com/api`)
+   - the deployed Render API URL: `https://mini-erp-crm-backend-gc3q.onrender.com/api`
 3. Run the **Login** request with any demo role from the table above — the response returns a JWT.
 4. Copy that token into an `authToken` environment variable.
 5. Every other request in the collection sends `Authorization: Bearer {{authToken}}` automatically, so all Customer / Product / Challan endpoints are ready to call immediately.

@@ -25,6 +25,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(false);
 
   // Restore last-used (or default) demo credentials on every mount —
   // i.e. on refresh, and whenever the user lands back here after logout.
@@ -83,10 +84,19 @@ export default function Login() {
         </div>
 
         <div className="login-doc-preview">
-          <div className="doc-line" style={{ width: "40%" }} />
-          <div className="doc-line" style={{ width: "85%" }} />
-          <div className="doc-line" style={{ width: "70%" }} />
-          <div className="doc-line" style={{ width: "55%", marginBottom: 0 }} />
+          <div className="doc-preview-topbar">
+            <span className="doc-dot doc-dot-a" />
+            <span className="doc-dot doc-dot-b" />
+            <span className="doc-dot doc-dot-c" />
+            <span className="doc-preview-title">Live preview</span>
+          </div>
+          <div className="doc-preview-chips">
+            <span className="doc-chip">Customers</span>
+            <span className="doc-chip">Stock</span>
+            <span className="doc-chip">Challans</span>
+          </div>
+          <div className="doc-line" style={{ width: "80%" }} />
+          <div className="doc-line" style={{ width: "60%", marginBottom: 0 }} />
         </div>
 
         <div className="login-visual-footer">
@@ -163,10 +173,17 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="login-role-hint">
-            <strong>Demo access:</strong> Pick a role below (or type any of the emails
-            into the field above — it's an editable dropdown) — password is the same
-            for every role, and editable too.
+          <details className="login-role-hint" open={demoOpen} onToggle={(e) => setDemoOpen((e.target as HTMLDetailsElement).open)}>
+            <summary className="demo-summary">
+              <span>Demo access</span>
+              <span className="demo-summary-hint">tap to {demoOpen ? "hide" : "view"} credentials</span>
+            </summary>
+
+            <p className="demo-copy">
+              Pick a role, or type any email into the field above — it's an editable
+              dropdown. Password is shared across roles and editable too.
+            </p>
+
             <div className="demo-cred-list">
               {DEMO_EMAILS.map((demoEmail) => (
                 <button
@@ -175,17 +192,17 @@ export default function Login() {
                   className="demo-cred-row"
                   onClick={() => fillDemo(demoEmail)}
                 >
+                  <span className="demo-cred-role-dot" />
                   <span className="demo-cred-email">{demoEmail}</span>
-                  <span className="demo-cred-role">
-                    {demoEmail.split("@")[0]}
-                  </span>
+                  <span className="demo-cred-role">{demoEmail.split("@")[0]}</span>
                 </button>
               ))}
             </div>
+
             <div className="demo-cred-password">
               Password for all roles: <code>{DEMO_PASSWORD}</code>
             </div>
-          </div>
+          </details>
         </div>
 
         <div style={{ marginTop: 32 }}>
